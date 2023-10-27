@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'dart:io';
+
+import 'package:path_provider/path_provider.dart';
 
 class Api {
   static const String apiUrl = "https://api.replicate.com/v1/predictions";
@@ -37,24 +40,46 @@ class Api {
     }
   }
 
+  static Future<File> saveUint8ListToFile(Uint8List bytes, String fileName) async {
+    // Uygulamanın belgeler klasörünü al
+    //Directory appDocDir = await getApplicationDocumentsDirectory();
+    String filePath = fileName;
+
+    // Dosya oluştur ve byte verisini yaz
+    return File(filePath).writeAsBytes(bytes);
+  }
+
+
+
   static Future<String> makePostRequest(
-      File pingImageResult, String userPrompt) async {
+      Uint8List convertedBytes, String userPrompt, File pingImageResult) async {
     final headers = {
       "Content-Type": "application/json",
       "Authorization": "Token $apiToken",
     };
 
     try {
-      var response = await Api.uploadImageToImgbb(pingImageResult);
+      Uint8List myData = convertedBytes;
+      File myFile = await saveUint8ListToFile(myData, pingImageResult.path);
+
+
+      var response = await Api.uploadImageToImgbb(myFile);
 
       if (response != "" || response != null) {
         final data = {
           "version":
           "3c64e669051f9b358e748c8e2fb8a06e64122a9ece762ef133252e2c99da77c1",
           "input": {
+            "prompt": userPrompt,
+            "negative_prompt":"ugly, disfigured, low quality, blurry, nsfw",
+            "num_inference_steps":40,
+            "guidance_scale":7.5,
+            "seed":1057727382,
+            "num_outputs":1,
             "image": response?["url"],
-            "prompt": "In the busy streets and in the mosque garden",
-            "controlnet_conditioning_scale":1.7
+            "controlnet_conditioning_scale":1,
+            "border":1,
+            "qrcode_background":"gray"
           }
         };
 

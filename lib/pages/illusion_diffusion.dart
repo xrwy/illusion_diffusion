@@ -250,7 +250,7 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
                     const SizedBox(height: 30.0,),
                     userPrompt.isNotEmpty && pingImageResult != null && _convertedBytes != null
                         ? FutureBuilder<String>(
-                        future: Api.makePostRequest(pingImageResult!, userPrompt),
+                        future: Api.makePostRequest(_convertedBytes!, userPrompt, pingImageResult!),
                         builder: (context, AsyncSnapshot<String> snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
