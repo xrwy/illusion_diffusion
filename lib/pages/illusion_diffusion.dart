@@ -359,7 +359,7 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
                                               const EdgeInsets.only(top: 30.0),
                                           child: Image.network(
                                             snapshot
-                                                .data!, 
+                                                .data!,
                                             loadingBuilder:
                                                 (BuildContext context,
                                                     Widget child,
