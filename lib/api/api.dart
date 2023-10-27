@@ -3,19 +3,18 @@ import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 
-import 'package:path_provider/path_provider.dart';
 
 class Api {
   static const String apiUrl = "https://api.replicate.com/v1/predictions";
-  static const String apiToken = "r8_bsr2q6wH1j8vchHqnNeNFfACErbZiEM1RrGzJ";
+  static const String apiToken = "r8_D4p5z9rd57dpuM4x9C7QONjiL0pJeLI3hcLcP";
 
-  static const api_KEY = "54c71b7361b4c5c6d495d474cfe9b378";
+  static const apiKEY = "54c71b7361b4c5c6d495d474cfe9b378";
 
   static Future<Map<String, dynamic>?> uploadImageToImgbb(
       File imagePath) async {
     final url = Uri.parse("https://api.imgbb.com/1/upload");
     final request = http.MultipartRequest('POST', url)
-      ..fields['key'] = api_KEY
+      ..fields['key'] = apiKEY
       ..fields['expiration'] = "600"
       ..files.add(await http.MultipartFile.fromPath('image', imagePath.path));
 
@@ -48,7 +47,7 @@ class Api {
 
 
   static Future<String> makePostRequest(
-      Uint8List convertedBytes, String userPrompt, File pingImageResult) async {
+      Uint8List convertedBytes, String userPrompt, File pingImageResult, String sliderValue) async {
     final headers = {
       "Content-Type": "application/json",
       "Authorization": "Token $apiToken",
@@ -73,18 +72,19 @@ class Api {
             "seed":1057727382,
             "num_outputs":1,
             "image": response?["url"],
-            "controlnet_conditioning_scale":1,
+            "controlnet_conditioning_scale": double.parse(sliderValue),
             "border":1,
             "qrcode_background":"gray"
           }
         };
-
         try {
           final response = await http.post(
             Uri.parse(apiUrl),
             headers: headers,
             body: json.encode(data),
           );
+
+          print(response.body);
 
           if (response.statusCode == 201) {
             final predictionId = json.decode(response.body)['id'];

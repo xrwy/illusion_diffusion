@@ -20,6 +20,9 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
   String userPrompt = "";
   File? pingImageResult;
   Uint8List? _convertedBytes;
+  double sliderValue = 1;
+
+  final ScrollController _controller = ScrollController();
 
   circularProgressIndicator() {
     return Container(
@@ -206,7 +209,34 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
                       ),
                     ),
                     const SizedBox(
-                      height: 20.0,
+                      height: 50.0,
+                    ),
+                    const Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Controlnet Conditioning Scale',
+                        style: TextStyle(
+                            fontSize: 17.0, fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                    Slider(
+                      value: sliderValue,
+                      min: 1,
+                      max: 4,
+                      label: sliderValue.toStringAsFixed(2),
+                      onChanged: (double value) {
+                        setState(() {
+                          sliderValue = value;
+                        });
+                      },
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                          'Selected Value : ${sliderValue.toStringAsFixed(2)}'),
+                    ),
+                    const SizedBox(
+                      height: 50.0,
                     ),
                     Align(
                         alignment: Alignment.center,
@@ -252,7 +282,7 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
                             _convertedBytes != null
                         ? FutureBuilder<String>(
                             future: Api.makePostRequest(
-                                _convertedBytes!, userPrompt, pingImageResult!),
+                                _convertedBytes!, userPrompt, pingImageResult!, sliderValue.toStringAsFixed(2)),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
@@ -283,8 +313,16 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
                                         child: Container(
                                             margin: const EdgeInsets.only(
                                                 top: 30.0),
-                                            child: Image.network(
-                                                snapshot.data!))));
+                                            child: Expanded(
+                                              child: ListView.builder(
+                                                controller: _controller,
+                                                itemCount: 50, // Örnek için 50 eleman
+                                                itemBuilder: (context, index) {
+                                                  _controller.jumpTo(0);
+                                                  return Image.network('URL'); // Buraya gerçek resim URL'inizi ekleyin
+                                                },
+                                              ),
+                                            ),)));
                               }
                             })
                         : const SizedBox(),
