@@ -41,14 +41,10 @@ class Api {
   }
 
   static Future<File> saveUint8ListToFile(Uint8List bytes, String fileName) async {
-    // Uygulamanın belgeler klasörünü al
-    //Directory appDocDir = await getApplicationDocumentsDirectory();
     String filePath = fileName;
 
-    // Dosya oluştur ve byte verisini yaz
     return File(filePath).writeAsBytes(bytes);
   }
-
 
 
   static Future<String> makePostRequest(
