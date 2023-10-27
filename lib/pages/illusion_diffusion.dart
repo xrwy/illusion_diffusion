@@ -358,23 +358,7 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
                                           margin:
                                               const EdgeInsets.only(top: 30.0),
                                           child: Image.network(
-                                            snapshot
-                                                .data!,
-                                            loadingBuilder:
-                                                (BuildContext context,
-                                                    Widget child,
-                                                    ImageChunkEvent?
-                                                        loadingProgress) {
-                                              if (loadingProgress == null) {
-                                                scrollToEnd();
-
-                                                return child;
-                                              }else {
-                                                return const Center(
-                                                    child:
-                                                    CircularProgressIndicator());
-                                              }
-                                            },
+                                            snapshot.data!,
                                           ),
                                         )));
                               } else {
@@ -387,14 +371,6 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
                   ],
                 ),
               ))),
-    );
-  }
-
-  scrollToEnd() {
-    _controller.animateTo(
-      _controller.position.maxScrollExtent,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
     );
   }
 }
