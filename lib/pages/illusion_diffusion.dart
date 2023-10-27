@@ -21,7 +21,6 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
   File? pingImageResult;
   Uint8List? _convertedBytes;
   double sliderValue = 1;
-
   final ScrollController _controller = ScrollController();
 
   circularProgressIndicator() {
@@ -137,6 +136,7 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
           child: Align(
               alignment: Alignment.center,
               child: SingleChildScrollView(
+                controller: _controller,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -238,42 +238,83 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
                     const SizedBox(
                       height: 50.0,
                     ),
-                    Align(
-                        alignment: Alignment.center,
-                        child: ElevatedButton(
-                            style: ButtonStyle(
-                              foregroundColor: MaterialStateProperty.all<Color>(
-                                  Colors.white),
-                              backgroundColor: MaterialStateProperty.all<Color>(
-                                  Colors.green),
-                              shape: MaterialStateProperty.all<
-                                      RoundedRectangleBorder>(
-                                  const RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(7.0)),
-                              )),
-                              padding: MaterialStateProperty.resolveWith<
-                                  EdgeInsetsGeometry>(
-                                (Set<MaterialState> states) {
-                                  return const EdgeInsets.all(15);
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Align(
+                            alignment: Alignment.center,
+                            child: ElevatedButton(
+                                style: ButtonStyle(
+                                  foregroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          Colors.white),
+                                  backgroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          Colors.green),
+                                  shape: MaterialStateProperty.all<
+                                          RoundedRectangleBorder>(
+                                      const RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(7.0)),
+                                  )),
+                                  padding: MaterialStateProperty.resolveWith<
+                                      EdgeInsetsGeometry>(
+                                    (Set<MaterialState> states) {
+                                      return const EdgeInsets.all(15);
+                                    },
+                                  ),
+                                ),
+                                onPressed: () {
+                                  if (_userPrompt.text.isNotEmpty) {
+                                    setState(() {
+                                      userPrompt = _userPrompt.text;
+                                    });
+                                  } else {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(const SnackBar(
+                                      content:
+                                          Text('The Input Field is Mandatory'),
+                                      backgroundColor: Colors.red,
+                                    ));
+                                  }
                                 },
-                              ),
-                            ),
-                            onPressed: () {
-                              if (_userPrompt.text.isNotEmpty) {
-                                setState(() {
-                                  userPrompt = _userPrompt.text;
-                                });
-                              } else {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(const SnackBar(
-                                  content: Text('The Input Field is Mandatory'),
-                                  backgroundColor: Colors.red,
-                                ));
-                              }
-                            },
-                            child: const Text("Create Image",
-                                style: TextStyle(fontSize: 18)))),
+                                child: const Text("Create Image",
+                                    style: TextStyle(fontSize: 18)))),
+                        Align(
+                            alignment: Alignment.center,
+                            child: ElevatedButton(
+                                style: ButtonStyle(
+                                  foregroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          Colors.white),
+                                  backgroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          Colors.red),
+                                  shape: MaterialStateProperty.all<
+                                          RoundedRectangleBorder>(
+                                      const RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(7.0)),
+                                  )),
+                                  padding: MaterialStateProperty.resolveWith<
+                                      EdgeInsetsGeometry>(
+                                    (Set<MaterialState> states) {
+                                      return const EdgeInsets.all(15);
+                                    },
+                                  ),
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    userPrompt = "";
+                                    pingImageResult = null;
+                                    _convertedBytes = null;
+                                    sliderValue = 1;
+                                  });
+                                },
+                                child: const Text("Clear All Fields",
+                                    style: TextStyle(fontSize: 18)))),
+                      ],
+                    ),
                     const SizedBox(
                       height: 30.0,
                     ),
@@ -282,7 +323,10 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
                             _convertedBytes != null
                         ? FutureBuilder<String>(
                             future: Api.makePostRequest(
-                                _convertedBytes!, userPrompt, pingImageResult!, sliderValue.toStringAsFixed(2)),
+                                _convertedBytes!,
+                                userPrompt,
+                                pingImageResult!,
+                                sliderValue.toStringAsFixed(2)),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
@@ -296,39 +340,61 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
                               } else if (snapshot.hasError) {
                                 return Align(
                                     alignment: Alignment.center,
-                                    child: SizedBox(
-                                      height: 150.0,
-                                      child: snapShotHasError(snapshot),
-                                    ));
+                                    child: snapShotHasError(snapshot));
                               } else if (!snapshot.hasData) {
                                 return Container(
                                   margin: const EdgeInsets.all(16.0),
                                   child: const Text("No Data"),
                                 );
-                              } else {
+                              } else if (snapshot.data!.endsWith(".png") ||
+                                  snapshot.data!.endsWith(".jpeg") ||
+                                  snapshot.data!.endsWith(".bmp") ||
+                                  snapshot.data!.endsWith(".psd")) {
                                 return Container(
                                     padding: const EdgeInsets.all(18.0),
                                     child: Align(
                                         alignment: Alignment.center,
                                         child: Container(
-                                            margin: const EdgeInsets.only(
-                                                top: 30.0),
-                                            child: Expanded(
-                                              child: ListView.builder(
-                                                controller: _controller,
-                                                itemCount: 50, // Örnek için 50 eleman
-                                                itemBuilder: (context, index) {
-                                                  _controller.jumpTo(0);
-                                                  return Image.network('URL'); // Buraya gerçek resim URL'inizi ekleyin
-                                                },
-                                              ),
-                                            ),)));
+                                          margin:
+                                              const EdgeInsets.only(top: 30.0),
+                                          child: Image.network(
+                                            snapshot
+                                                .data!, // Resim URL'sini gerçek bir URL ile değiştirin
+                                            loadingBuilder:
+                                                (BuildContext context,
+                                                    Widget child,
+                                                    ImageChunkEvent?
+                                                        loadingProgress) {
+                                              if (loadingProgress == null) {
+                                                scrollToEnd();
+
+                                                return child;
+                                              }else {
+                                                return const Center(
+                                                    child:
+                                                    CircularProgressIndicator());
+                                              }
+                                            },
+                                          ),
+                                        )));
+                              } else {
+                                return Align(
+                                    alignment: Alignment.center,
+                                    child: Text(snapshot.data!));
                               }
                             })
                         : const SizedBox(),
                   ],
                 ),
               ))),
+    );
+  }
+
+  scrollToEnd() {
+    _controller.animateTo(
+      _controller.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
     );
   }
 }

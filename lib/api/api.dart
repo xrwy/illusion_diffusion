@@ -10,39 +10,42 @@ class Api {
 
   static const apiKEY = "54c71b7361b4c5c6d495d474cfe9b378";
 
+  static File? filePathWriteAsBytes;
+  static String filePath = "";
+
   static Future<Map<String, dynamic>?> uploadImageToImgbb(
-      File imagePath) async {
+      String imagePath) async {
     final url = Uri.parse("https://api.imgbb.com/1/upload");
     final request = http.MultipartRequest('POST', url)
       ..fields['key'] = apiKEY
       ..fields['expiration'] = "600"
-      ..files.add(await http.MultipartFile.fromPath('image', imagePath.path));
+      ..files.add(await http.MultipartFile.fromPath('image', imagePath));
 
     try {
       final response = await request.send();
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
         final Map<String, dynamic> jsonResponse = jsonDecode(responseBody);
-        print("Image uploaded!");
         return {
           "url": jsonResponse['data']['url'],
           "delete_url": jsonResponse['data']['delete_url'],
         };
       } else {
-        print("Image upload failed.");
-        print(response.reasonPhrase);
         return null;
       }
     } catch (e) {
-      print("Error: $e");
       return null;
     }
   }
 
-  static Future<File> saveUint8ListToFile(Uint8List bytes, String fileName) async {
-    String filePath = fileName;
-
-    return File(filePath).writeAsBytes(bytes);
+  static Future<String?> saveUint8ListToFile(Uint8List bytes, String fileName) async {
+    filePath = fileName;
+    try {
+      filePathWriteAsBytes = await File(filePath).writeAsBytes(bytes);
+      return null;
+    }catch (e) {
+      return e.toString();
+    }
   }
 
 
@@ -55,10 +58,14 @@ class Api {
 
     try {
       Uint8List myData = convertedBytes;
-      File myFile = await saveUint8ListToFile(myData, pingImageResult.path);
+      String? myFile = await saveUint8ListToFile(myData, pingImageResult.path);
+
+      if(myFile != null){
+        throw Exception(myFile.toString());
+      }
 
 
-      var response = await Api.uploadImageToImgbb(myFile);
+      var response = await Api.uploadImageToImgbb(filePath);
 
       if (response != "" || response != null) {
         final data = {
@@ -84,7 +91,6 @@ class Api {
             body: json.encode(data),
           );
 
-          print(response.body);
 
           if (response.statusCode == 201) {
             final predictionId = json.decode(response.body)['id'];
@@ -97,31 +103,28 @@ class Api {
 
               if (status == "succeeded") {
                 final imageUrl = json.decode(checkResponse.body)['output'];
-                print("Resim URL'si: $imageUrl");
-
                 return imageUrl[0];
               } else if (status == "failed") {
-                throw Exception("Resim yüklenirken bir hata oluştu.");
+                throw Exception("An error occurred while loading the image.");
               }
 
               await Future.delayed(const Duration(seconds: 2));
             }
           } else {
             throw Exception(
-                "İstek başarısız oldu. Durum kodu: ${response.statusCode}");
+                "The request failed. Status code: ${response.statusCode}");
           }
         } catch (e) {
           if (e is SocketException) {
-            throw Exception("İnternet bağlantınızı kontrol edin.");
+            throw Exception("Check your internet connection.");
           } else {
-            throw Exception("Bir hata oluştu. $e");
+            throw Exception("Something went wrong. $e");
           }
         }
       }else {
-        throw Exception("Hatalı");
+        throw Exception("Error");
       }
     } catch (e) {
-
       throw Exception(e.toString());
     }
   }
