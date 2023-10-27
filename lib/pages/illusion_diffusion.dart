@@ -5,7 +5,6 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:image/image.dart' as img;
 
-
 class IllusionDiffusion extends StatefulWidget {
   const IllusionDiffusion({super.key});
 
@@ -22,7 +21,6 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
   File? pingImageResult;
   Uint8List? _convertedBytes;
 
-
   circularProgressIndicator() {
     return Container(
       margin: const EdgeInsets.only(top: 60.0),
@@ -33,30 +31,30 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
   snapShotHasError(snapshot) {
     Center(
         child: Container(
-          padding: const EdgeInsets.all(20.0),
-          decoration: const BoxDecoration(
-              color: Colors.red,
-              borderRadius: BorderRadius.all(Radius.circular(8.0))),
-          child: Container(
-            margin: null,
-            child: Column(
-              children: [
-                const Text(
-                  'Error',
-                  style: TextStyle(
-                      fontSize: 20.0,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: 10.0),
-                Text(
-                  '${snapshot.error}',
-                  style: const TextStyle(fontSize: 20.0, color: Colors.black),
-                )
-              ],
+      padding: const EdgeInsets.all(20.0),
+      decoration: const BoxDecoration(
+          color: Colors.red,
+          borderRadius: BorderRadius.all(Radius.circular(8.0))),
+      child: Container(
+        margin: null,
+        child: Column(
+          children: [
+            const Text(
+              'Error',
+              style: TextStyle(
+                  fontSize: 20.0,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w700),
             ),
-          ),
-        ));
+            const SizedBox(height: 10.0),
+            Text(
+              '${snapshot.error}',
+              style: const TextStyle(fontSize: 20.0, color: Colors.black),
+            )
+          ],
+        ),
+      ),
+    ));
   }
 
   Future selectImage() async {
@@ -67,14 +65,13 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
       setState(() => pingImageResult = imageTemp);
 
       _convertImageToGrayScale();
-
     } on PlatformException catch (e) {
       throw Exception(e.toString());
     }
   }
 
   _convertImageToGrayScale() async {
-    if(pingImageResult != null){
+    if (pingImageResult != null) {
       File imageFile = File(pingImageResult!.path);
       Uint8List bytesList = await imageFile.readAsBytes();
 
@@ -142,21 +139,21 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
                   children: [
                     pingImageResult != null && _convertedBytes != null
                         ? Container(
-                      padding: const EdgeInsets.all(18.0),
-                      child: Column(
-                        children: [
-                          Align(
-                              alignment: Alignment.center,
-                              child: Image.memory(
-                                _convertedBytes!,
-                                height: 350.0,
-                              )),
-                          const SizedBox(
-                            height: 10.0,
-                          ),
-                        ],
-                      ),
-                    )
+                            padding: const EdgeInsets.all(18.0),
+                            child: Column(
+                              children: [
+                                Align(
+                                    alignment: Alignment.center,
+                                    child: Image.memory(
+                                      _convertedBytes!,
+                                      height: 350.0,
+                                    )),
+                                const SizedBox(
+                                  height: 10.0,
+                                ),
+                              ],
+                            ),
+                          )
                         : const SizedBox(),
                     Align(
                         alignment: Alignment.center,
@@ -164,18 +161,18 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
                         child: ElevatedButton(
                           style: ButtonStyle(
                             foregroundColor:
-                            MaterialStateProperty.all<Color>(Colors.white),
+                                MaterialStateProperty.all<Color>(Colors.white),
                             backgroundColor: MaterialStateProperty.all<Color>(
                                 Colors.blueAccent),
                             shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
+                                    RoundedRectangleBorder>(
                                 const RoundedRectangleBorder(
-                                  borderRadius:
+                              borderRadius:
                                   BorderRadius.all(Radius.circular(7.0)),
-                                )),
+                            )),
                             padding: MaterialStateProperty.resolveWith<
                                 EdgeInsetsGeometry>(
-                                  (Set<MaterialState> states) {
+                              (Set<MaterialState> states) {
                                 return const EdgeInsets.all(15);
                               },
                             ),
@@ -220,14 +217,14 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
                               backgroundColor: MaterialStateProperty.all<Color>(
                                   Colors.green),
                               shape: MaterialStateProperty.all<
-                                  RoundedRectangleBorder>(
+                                      RoundedRectangleBorder>(
                                   const RoundedRectangleBorder(
-                                    borderRadius:
+                                borderRadius:
                                     BorderRadius.all(Radius.circular(7.0)),
-                                  )),
+                              )),
                               padding: MaterialStateProperty.resolveWith<
                                   EdgeInsetsGeometry>(
-                                    (Set<MaterialState> states) {
+                                (Set<MaterialState> states) {
                                   return const EdgeInsets.all(15);
                                 },
                               ),
@@ -247,33 +244,49 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
                             },
                             child: const Text("Create Image",
                                 style: TextStyle(fontSize: 18)))),
-                    const SizedBox(height: 30.0,),
-                    userPrompt.isNotEmpty && pingImageResult != null && _convertedBytes != null
+                    const SizedBox(
+                      height: 30.0,
+                    ),
+                    userPrompt.isNotEmpty &&
+                            pingImageResult != null &&
+                            _convertedBytes != null
                         ? FutureBuilder<String>(
-                        future: Api.makePostRequest(_convertedBytes!, userPrompt, pingImageResult!),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Align(
-                              alignment: Alignment.center,
-                              child: Container(margin: const EdgeInsets.only(bottom:30.0), child: circularProgressIndicator(),),);
-                          } else if (snapshot.hasError) {
-                            return Align(
-                              alignment: Alignment.center,
-                              child: SizedBox(height: 150.0, child: snapShotHasError(snapshot),));
-                          } else {
-                            return Container(
-                                padding: const EdgeInsets.all(18.0),
-                                child: Align(
+                            future: Api.makePostRequest(
+                                _convertedBytes!, userPrompt, pingImageResult!),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Align(
+                                  alignment: Alignment.center,
+                                  child: Container(
+                                    margin: const EdgeInsets.only(bottom: 30.0),
+                                    child: circularProgressIndicator(),
+                                  ),
+                                );
+                              } else if (snapshot.hasError) {
+                                return Align(
                                     alignment: Alignment.center,
-                                    child: Container(
-                                        margin: const EdgeInsets.only(
-                                            top: 30.0),
-                                        child: Image.network(
-                                            snapshot.data!)))
-                            );
-                          }
-                        })
+                                    child: SizedBox(
+                                      height: 150.0,
+                                      child: snapShotHasError(snapshot),
+                                    ));
+                              } else if (!snapshot.hasData) {
+                                return Container(
+                                  margin: const EdgeInsets.all(16.0),
+                                  child: const Text("No Data"),
+                                );
+                              } else {
+                                return Container(
+                                    padding: const EdgeInsets.all(18.0),
+                                    child: Align(
+                                        alignment: Alignment.center,
+                                        child: Container(
+                                            margin: const EdgeInsets.only(
+                                                top: 30.0),
+                                            child: Image.network(
+                                                snapshot.data!))));
+                              }
+                            })
                         : const SizedBox(),
                   ],
                 ),
