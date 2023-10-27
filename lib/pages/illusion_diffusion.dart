@@ -45,13 +45,13 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
                   'Error',
                   style: TextStyle(
                       fontSize: 20.0,
-                      color: Colors.white,
+                      color: Colors.black,
                       fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 10.0),
                 Text(
                   '${snapshot.error}',
-                  style: const TextStyle(fontSize: 20.0, color: Colors.white),
+                  style: const TextStyle(fontSize: 20.0, color: Colors.black),
                 )
               ],
             ),
@@ -251,14 +251,16 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
                     userPrompt.isNotEmpty && pingImageResult != null && _convertedBytes != null
                         ? FutureBuilder<String>(
                         future: Api.makePostRequest(_convertedBytes!, userPrompt, pingImageResult!),
-                        builder: (context, AsyncSnapshot<String> snapshot) {
+                        builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
                             return Align(
                               alignment: Alignment.center,
                               child: Container(margin: const EdgeInsets.only(bottom:30.0), child: circularProgressIndicator(),),);
                           } else if (snapshot.hasError) {
-                            return Container(height: 150.0, child: snapShotHasError(snapshot),);
+                            return Align(
+                              alignment: Alignment.center,
+                              child: SizedBox(height: 150.0, child: snapShotHasError(snapshot),));
                           } else {
                             return Container(
                                 padding: const EdgeInsets.all(18.0),
