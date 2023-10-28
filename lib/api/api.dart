@@ -1,24 +1,23 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
+import 'package:illusion_diffusion/models/imgbb.dart';
 import 'dart:io';
 
-class Api {
-  static const String apiUrl = "https://api.replicate.com/v1/predictions";
-  static const String apiToken = "r8_D4p5z9rd57dpuM4x9C7QONjiL0pJeLI3hcLcP";
+import 'package:illusion_diffusion/models/replicate.dart';
 
-  static const apiKEY = "54c71b7361b4c5c6d495d474cfe9b378";
+class Api {
 
   static File? filePathWriteAsBytes;
   static String filePath = "";
 
   static Future<Map<String, dynamic>?> uploadImageToImgbb(
       String imagePath) async {
-    final url = Uri.parse("https://api.imgbb.com/1/upload");
+    final url = Uri.parse(ImgBb().apiUrl);
     final multiPart = await http.MultipartFile.fromPath('image', imagePath);
 
     final request = http.MultipartRequest('POST', url)
-      ..fields['key'] = apiKEY
+      ..fields['key'] = ImgBb().apiKey
       ..fields['expiration'] = "600"
       ..files.add(multiPart);
 
@@ -54,7 +53,7 @@ class Api {
 
     final headers = {
       "Content-Type": "application/json",
-      "Authorization": "Token $apiToken",
+      "Authorization": "Token ${Replicate().apiToken}",
     };
 
     Map<String, dynamic>? response_ = {};
@@ -85,14 +84,14 @@ class Api {
         };
 
         final response = await http.post(
-          Uri.parse(apiUrl),
+          Uri.parse(Replicate().apiUrl),
           headers: headers,
           body: json.encode(data),
         );
 
         if (response.statusCode == 201) {
           final predictionId = json.decode(response.body)['id'];
-          final getUrl = "$apiUrl/$predictionId";
+          final getUrl = "${Replicate().apiUrl}/$predictionId";
 
           while (true) {
             final checkResponse =
