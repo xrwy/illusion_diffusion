@@ -65,7 +65,7 @@ class Api {
 
       response_ = response;
 
-      if (response != null && response['url'] && response['url'] is String) {
+      if (response != null && response['url'] is String) {
         final data = {
           "version":
               "3c64e669051f9b358e748c8e2fb8a06e64122a9ece762ef133252e2c99da77c1",
@@ -102,24 +102,24 @@ class Api {
               final imageUrl = json.decode(checkResponse.body)['output'];
               return imageUrl[0];
             } else if (status == "failed") {
-              throw Exception("An error occurred while loading the image.").toString().substring(11);
+              throw Exception("An error occurred while loading the image.");
             }
 
             await Future.delayed(const Duration(seconds: 2));
           }
         } else {
           throw Exception(
-              "The request failed. Status code: ${response.statusCode}").toString().substring(11);
+              "The request failed. Status code: ${response.statusCode}");
         }
       } else {
         throw Exception(
-            "Status Code: ${response?['status_code']}\n Error: ${response?['error']}\n Status Text: ${response?['status_txt']}").toString().substring(11);
+            "Status Code: ${response?['status_code']}\n Error: ${response?['error']}\n Status Text: ${response?['status_txt']}");
       }
     } catch (e) {
       if (e is SocketException) {
-        throw Exception("Check Your Internet Connection.").toString().substring(11);
+        throw Exception("Check Your Internet Connection.");
       } else {
-        throw Exception(e.toString());
+        throw Exception(e.toString()).toString().substring(11);  // We removed one extra or redundant Exception section with the code on the left.
       }
     }
   }
