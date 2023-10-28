@@ -31,9 +31,10 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
   }
 
   snapShotHasError(snapshot) {
-    Center(
+    return Center(
         child: Container(
-      padding: const EdgeInsets.all(20.0),
+          margin: const EdgeInsets.only(bottom: 35.0, right: 29.0, left: 29.0),
+      padding: const EdgeInsets.only(top: 20.0, right: 45.0, bottom: 20.0, left: 45.0),
       decoration: const BoxDecoration(
           color: Colors.red,
           borderRadius: BorderRadius.all(Radius.circular(8.0))),
@@ -44,14 +45,14 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
             const Text(
               'Error',
               style: TextStyle(
-                  fontSize: 20.0,
-                  color: Colors.black,
+                  fontSize: 22.0,
+                  color: Colors.white,
                   fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 10.0),
             Text(
               '${snapshot.error}',
-              style: const TextStyle(fontSize: 20.0, color: Colors.black),
+              style: const TextStyle(fontSize: 20.0, color: Colors.white),
             )
           ],
         ),
@@ -364,7 +365,7 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
                               } else {
                                 return Align(
                                     alignment: Alignment.center,
-                                    child: Text(snapshot.data!));
+                                    child: Text("ergfergre"));
                               }
                             })
                         : const SizedBox(),
