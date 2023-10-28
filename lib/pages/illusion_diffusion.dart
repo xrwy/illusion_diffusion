@@ -334,7 +334,7 @@ class IllusionDiffusionState extends State<IllusionDiffusion> {
                                 return Align(
                                   alignment: Alignment.center,
                                   child: Container(
-                                    margin: const EdgeInsets.only(bottom: 30.0),
+                                    margin: const EdgeInsets.only(bottom: 70.0),
                                     child: circularProgressIndicator(),
                                   ),
                                 );
